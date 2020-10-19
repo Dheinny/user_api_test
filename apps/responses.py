@@ -117,7 +117,7 @@ def resp_ok_no_content():
     """
 
     resp = jsonify()
-    resp.status_code = 200
+    resp.status_code = 204
 
     return resp
 

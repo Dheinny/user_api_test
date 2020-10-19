@@ -1,5 +1,7 @@
 from mongoengine.errors import NotUniqueError, ValidationError
 
+from apps.users.models import User
+
 from apps.responses import(
     resp_already_exists,
     resp_resource_not_exists,
@@ -12,6 +14,19 @@ from apps.responses import(
 
 def check_password_in_signup(password, confirm_password):
     return password == confirm_password
+
+def get_user_by_user_name(username):
+    try:
+        return User.objects.get(user_name = username)
+    except DoesNotExist as e:
+        resource_info = kwargs.popitem()
+        return resp_resource_not_exists("Resource", "Usuário", resource_info[1])
+
+    except FieldDoesNotExist as e:
+        return resp_expection("Users", description=e.__str__())
+
+    except Exception as e:
+        return resp_exception("Resource", description=e.__str__())
 
 
 def save_model(model, resource="Resource", desc="Recurso"):

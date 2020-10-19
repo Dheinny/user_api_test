@@ -20,6 +20,7 @@ class UserRegistrationSchema(Schema):
     user_name = Str(required=True, error_messages={"required": MSG_FIELD_REQUIRED})
     email = Email(required=True, error_messages={"required": MSG_FIELD_REQUIRED})
     address = Nested(AddressSchema)
+    admin = Boolean()
     password = Str(required=True, error_messages={"required": MSG_FIELD_REQUIRED})
 
 
@@ -28,6 +29,7 @@ class UserSchema(Schema):
     user_name = Str(required=True, error_messages={"required": MSG_FIELD_REQUIRED})
     email = Email(required=True, error_messages={"required": MSG_FIELD_REQUIRED})
     address = Nested(AddressSchema)
+    admin = Boolean()
     active = Boolean()
 
 
@@ -36,6 +38,7 @@ class UserUpdateSchema(Schema):
     user_name = Str()
     email = Email()
     address = Nested(AddressSchema)
+    admin = Boolean()
     active = Boolean()
 
 

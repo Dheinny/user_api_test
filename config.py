@@ -16,7 +16,7 @@ class Config:
         minutes=int(getenv("JWT_ACCESS_TOKEN_EXPIRES"))
     )
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(
-        day=int(getenv("JWT_REFRESH_TOKEN_EXPIRES"))
+        days=int(getenv("JWT_REFRESH_TOKEN_EXPIRES"))
     )
 
 class DevelopmentConfig(Config):

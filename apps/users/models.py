@@ -34,14 +34,7 @@ class Address(EmbeddedDocument):
     country = StringField(default="Brasil")
 
 
-class Roles (EmbeddedDocument):
-    """
-    Roles permissions
-    """
-    admin = BooleanField(default=False)
-
-
-class User(db.Document):
+class User(db.DynamicDocument):
     meta = {"collections": "users",
             "ordering": ["email"]}
 
@@ -53,13 +46,14 @@ class User(db.Document):
     address = EmbeddedDocumentField(Address, default=Address)
     password = StringField(required=True)
     active = BooleanField(default=False)
+    admin = BooleanField(default=False)
     created_at = DateTimeField(default = datetime.now)
 
     def is_active(self):
         return self.active
 
     def is_admin(self):
-        return self.roles.admin
+        return self.admin
 
 
 

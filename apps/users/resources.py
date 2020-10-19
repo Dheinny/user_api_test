@@ -49,24 +49,17 @@ class SignUp(Resource):
             data= schema.load(req_data)
 
         except MarshmallowValidationError as e:
-            return resp_data_invalid("Users", e.__str__())
+            return resp_data_invalid("Users", e.messages)
 
         hashed = hashpw(password.encode("utf-8"), gensalt(12))
 
-        try:
-            data["password"] = hashed
-            data["email"] = data["email"].lower()
-            model = User(**data)
-            model.save()
+        data["password"] = hashed
+        data["email"] = data["email"].lower()
+        model = User(**data)
 
-        except NotUniqueError:
-            return resp_already_exists("Users", "Usuário")
-
-        except ValidationError as e:
-            return resp_exception("Users", msg=MSG_INVALID_DATA, description="e")
-
-        except Exception as e:
-            return resp_exception("Users", description=e)
+        save_result = save_model(model, "Users", "Usuário")
+        if not isinstance(save_result, User):
+            return save_result
 
         schema = UserSchema()
         result = schema.dump(model)
@@ -90,7 +83,7 @@ class UserResource(Resource):
         try:
             user_up = up_schema.load(req_data, unknown=EXCLUDE)
         except MarshmallowValidationError as e:
-            return resp_data_invalid("Users", e.__str__())
+            return resp_data_invalid("Users", e.messages)
 
         if user_up.get("user_name") and user_up.get("user_name") != username:
             return resp_data_invalid("Users", {"user_name": user_up.get("user_name")}, "Nao pode alterar o nome de usuário")
@@ -104,7 +97,7 @@ class UserResource(Resource):
                     user[k] = v
 
         except Exception as e:
-            return resp_exception("Users", description=e.__str__())
+            return resp_exception("Users-Aqui", description=e.__str__())
 
 
         save_result = save_model(user, "Users", "Usuário")
