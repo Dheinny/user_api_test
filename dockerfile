@@ -1,3 +1,5 @@
+#!/bin/bash
+
 FROM python:3.8-alpine
 RUN rm -rf /var/cache/apk/* && \
     apk update && \
@@ -23,4 +25,5 @@ RUN python -m venv venv && \
     venv/bin/pip install -r requirements/develop.txt
 
 EXPOSE 5000
+COPY . $HOME
 ENTRYPOINT [ "./boot.sh" ]

@@ -2,6 +2,8 @@ from mongoengine.errors import NotUniqueError, ValidationError, DoesNotExist
 
 from apps.users.models import User
 
+from apps.messages import MSG_INVALID_DATA
+
 from apps.responses import(
     resp_already_exists,
     resp_resource_not_exists,
