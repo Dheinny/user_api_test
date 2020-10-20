@@ -16,6 +16,7 @@ from apps.responses import (
 )
 
 from apps.auth.schemas import LoginSchema
+from apps.utils import get_user_by_user_name
 
 class AuthResource(Resource):
     def post(self, *args, **kwargs):
@@ -36,11 +37,7 @@ class AuthResource(Resource):
         except MarshmallowValidationError as e:
             return resp_data_invalid("Users", desc=e.__str__())
 
-        try:
-            user = User.objects.get(user_name=data["user_name"])
-        except Exception as e:
-            return resp_exception("Users", description=e.__str__())
-
+        user = get_user_by_user_name(data["user_name"])
         if not isinstance(user, User):
             return user
 
