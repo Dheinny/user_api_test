@@ -1,4 +1,4 @@
-from mongoengine.errors import NotUniqueError, ValidationError
+from mongoengine.errors import NotUniqueError, ValidationError, DoesNotExist
 
 from apps.users.models import User
 
@@ -19,8 +19,7 @@ def get_user_by_user_name(username):
     try:
         return User.objects.get(user_name = username)
     except DoesNotExist as e:
-        resource_info = kwargs.popitem()
-        return resp_resource_not_exists("Resource", "Usuário", resource_info[1])
+        return resp_resource_not_exists("Resource", "Usuário", username)
 
     except FieldDoesNotExist as e:
         return resp_expection("Users", description=e.__str__())

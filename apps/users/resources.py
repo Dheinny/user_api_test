@@ -3,6 +3,7 @@
 from flask import request
 
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required
 from bcrypt import gensalt, hashpw, checkpw
 from mongoengine.errors import NotUniqueError, ValidationError
 from marshmallow import EXCLUDE
@@ -19,14 +20,15 @@ from apps.responses import(
 
 from apps.users.models import User
 from apps.users.schemas import UserRegistrationSchema, UserSchema, UserUpdateSchema
-from apps.utils import check_password_in_signup, save_model
+from apps.utils import check_password_in_signup, save_model, get_user_by_user_name
 
 from apps.messages import (
     MSG_CHECK_PASSWORD_FAILED, MSG_NO_DATA, MSG_INVALID_DATA, MSG_RESOURCE_CREATED,
     MSG_RESOURCE_FETCHED, MSG_RESOURCE_UPDATED, MSG_PASSWORD_CHANGED,
 )
 
-from apps.decorators.methods_decorator import GetDecorator
+from apps.decorators.methods_decorator import AuthenticationDecorator
+
 
 class SignUp(Resource):
     def post(self, *args, **kwargs):
@@ -70,15 +72,16 @@ class SignUp(Resource):
 
 
 class UserResource(Resource):
+    @jwt_required
+    @AuthenticationDecorator
     def put(self, username):
         schema = UserSchema()
         up_schema = UserUpdateSchema()
         req_data = request.get_json() or None
 
-        try:
-            user = User.objects.get(user_name=username)
-        except Exception as e:
-            return resp_exception("Users", description=e.__str__())
+        user = get_user_by_user_name(username)
+        if not isinstance(user, User):
+            return user
 
         try:
             user_up = up_schema.load(req_data, unknown=EXCLUDE)
@@ -112,34 +115,42 @@ class UserResource(Resource):
 
 
     @staticmethod
-    @GetDecorator
+    @jwt_required
+    @AuthenticationDecorator
     def get(username):
         schema = UserSchema()
-        user = User.objects.get(user_name=username)
-        
+        user = get_user_by_user_name(username)
+        if not isinstance(user, User):
+            return user
+
         result = schema.dump(user)
 
         return resp_ok(
             "Users", MSG_RESOURCE_FETCHED.format("Usuário", username), result)
 
     @staticmethod
-    @GetDecorator
+    @jwt_required
+    @AuthenticationDecorator
     def delete(username):
         schema = UserSchema()
-        user = User.objects.get(user_name=username)
+        user = get_user_by_user_name(username)
+        if not isinstance(user, User):
+            return user
+
         user.delete()        
 
         return resp_ok_no_content()
 
 class UserPassword(Resource):
+    @jwt_required
+    @AuthenticationDecorator
     def put(self, username):
         
         req_data = request.get_json() or None
 
-        try:
-            user = User.objects.get(user_name=username)
-        except Exception as e:
-            return resp_exception("Users", description=e.__str__())
+        user = get_user_by_user_name(username)
+        if not isinstance(user, User):
+            return user
         
         current_password = req_data.get("current_password")
         new_password = req_data.get("new_password")
@@ -154,7 +165,6 @@ class UserPassword(Resource):
 
         new_pass_hashed = hashpw(new_password.encode("utf-8"), gensalt(12)).decode("utf-8")
         user["password"] = new_pass_hashed
-
 
         save_result = save_model(user, "Users", "Usuário")
         if not isinstance(save_result, User):

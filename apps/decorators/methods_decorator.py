@@ -13,24 +13,6 @@ from apps.responses import(
 from apps.users.models import User
 from apps.utils import get_user_by_user_name
 
-class GetDecorator(object):
-    def __init__(self, f):
-        self.f = f
-
-    def __call__(self, *args, **kwargs):
-        try:
-            return self.f(*args, **kwargs)
-        
-        except DoesNotExist as e:
-            resource_info = kwargs.popitem()
-            return resp_resource_not_exists("Resource", "Usuário", resource_info[1])
-
-        except FieldDoesNotExist as e:
-            return resp_expection("Users", description=e.__str__())
-
-        except Exception as e:
-            return resp_exception("Resource", description=e.__str__())
-
 class AuthAdminDecorator(object):
     def __init__(self, f):
         self.f = f
@@ -41,6 +23,18 @@ class AuthAdminDecorator(object):
             return user
 
         if user.is_admin():
+            return self.f(*args, **kwargs)
+        else:
+            return resp_notallowed_user("Users")
+
+class AuthenticationDecorator(object):
+    def __init__(self, f):
+        self.f = f
+
+    def __call__(self, *args, **kwargs):
+        username_login = get_jwt_identity()
+
+        if username_login == kwargs["username"]:
             return self.f(*args, **kwargs)
         else:
             return resp_notallowed_user("Users")

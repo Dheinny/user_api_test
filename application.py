@@ -10,7 +10,7 @@ app = create_app(getenv('FLASK_ENV') or 'default')
 
 if __name__ == '__main__':
     ip = '0.0.0.0'
-    port = app.config['APP_PORT']
+    port = app.config['PORT']
     debug = app.config['DEBUG']
 
     # execute flask web serve
