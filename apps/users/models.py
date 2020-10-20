@@ -34,7 +34,7 @@ class Address(EmbeddedDocument):
     country = StringField(default="Brasil")
 
 
-class User(db.DynamicDocument):
+class User(db.Document):
     meta = {"collections": "users",
             "ordering": ["email"]}
 

@@ -53,12 +53,12 @@ class SignUp(Resource):
         except MarshmallowValidationError as e:
             return resp_data_invalid("Users", e.messages)
 
-        hashed = hashpw(password.encode("utf-8"), gensalt(12))
-
+        hashed = hashpw(password.encode("utf-8"), gensalt(12)).decode("utf-8")
+        
         data["password"] = hashed
         data["email"] = data["email"].lower()
         model = User(**data)
-
+        print(data)
         save_result = save_model(model, "Users", "Usuário")
         if not isinstance(save_result, User):
             return save_result

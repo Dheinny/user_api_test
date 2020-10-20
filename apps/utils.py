@@ -43,4 +43,5 @@ def save_model(model, resource="Resource", desc="Recurso"):
     except Exception as e:
         return resp_exception(resource, description=e)
 
-    
+
+
