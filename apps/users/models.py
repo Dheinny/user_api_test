@@ -44,6 +44,7 @@ class User(db.Document):
     date_of_born = DateTimeField()
     email = EmailField(required=True, unique=True)
     address = EmbeddedDocumentField(Address, default=Address)
+    phone = StringField()
     password = StringField(required=True)
     active = BooleanField(default=False)
     admin = BooleanField(default=False)
